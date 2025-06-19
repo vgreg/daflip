@@ -65,18 +65,84 @@ def convert_data(
     sheet_name: Optional[str] = None,
     table_number: Optional[int] = None,
     sas_keep_bytes: bool = False,
+    input_chunk_size: Optional[int] = None,
+    output_chunk_size: Optional[int] = None,
+    schema_file: Optional[str] = None,
     config: Optional[Dict] = None,
 ):
     """Convert data from one format to another using pandas and pyarrow.
 
     Args:
-        sas_keep_bytes: If True, keep SAS string columns as bytes. If False (default), decode to string.
+        schema_file: Optional JSON file specifying schema to use for reading/writing.
     """
+    import json
+
+    import pyarrow as pa
+
     try:
-        # Infer formats
         in_fmt = infer_format(input_file, input_format)
         out_fmt = infer_format(output_file, output_format)
-        # Read
+        sas_encoding = None if sas_keep_bytes else "utf-8"
+        user_schema = None
+        if schema_file:
+            with open(schema_file, "r") as f:
+                schema_json = json.load(f)
+                user_schema = pa.schema(
+                    [
+                        pa.field(f["name"], getattr(pa, f["type"]))
+                        for f in schema_json["fields"]
+                    ]
+                )
+        # Supported chunked reading
+        chunked_read_formats = {"csv", "sas7bdat"}
+        chunked_write_formats = {"csv", "parquet"}  # feather does not support append
+        # Validate chunking support
+        if input_chunk_size and in_fmt not in chunked_read_formats:
+            raise NotImplementedError(
+                f"Chunked reading is not supported for input format: {in_fmt}"
+            )
+        if output_chunk_size and out_fmt not in chunked_write_formats:
+            raise NotImplementedError(
+                f"Chunked writing is not supported for output format: {out_fmt}"
+            )
+        # Read in chunks if requested
+        if input_chunk_size:
+            if in_fmt == "csv":
+                reader = pd.read_csv(
+                    input_file, chunksize=input_chunk_size, dtype_backend="pyarrow"
+                )
+            elif in_fmt == "sas7bdat":
+                reader = pd.read_sas(
+                    input_file, chunksize=input_chunk_size, encoding=sas_encoding
+                )
+            else:
+                raise NotImplementedError(
+                    f"Chunked reading is not implemented for {in_fmt}"
+                )
+            first = True
+            for chunk in reader:
+                # Row selection not supported in chunked mode
+                # Write chunk
+                if out_fmt == "csv":
+                    chunk.to_csv(
+                        output_file,
+                        mode="w" if first else "a",
+                        header=first,
+                        index=False,
+                    )
+                elif out_fmt == "parquet":
+                    import pyarrow as pa
+                    import pyarrow.parquet as pq
+
+                    table = pa.Table.from_pandas(chunk)
+                    if first:
+                        pqwriter = pq.ParquetWriter(output_file, table.schema)
+                    pqwriter.write_table(table)
+                first = False
+            if out_fmt == "parquet" and "pqwriter" in locals():
+                pqwriter.close()
+            return
+        # Non-chunked read
         read_kwargs = {"dtype_backend": "pyarrow"}
         if in_fmt in SEP_MAP:
             read_kwargs["sep"] = SEP_MAP[in_fmt]
@@ -101,17 +167,7 @@ def convert_data(
         elif in_fmt == "feather":
             df = pd.read_feather(input_file, **read_kwargs)
         elif in_fmt == "sas7bdat":
-            df = pd.read_sas(input_file)
-            if not sas_keep_bytes:
-                for col in df.select_dtypes(include=["object"]):
-                    if df[col].apply(lambda x: isinstance(x, bytes)).any():
-                        df[col] = df[col].apply(
-                            lambda x: x.decode(errors="replace")
-                            if isinstance(x, bytes)
-                            else x
-                        )
-                if hasattr(df, "convert_dtypes"):
-                    df = df.convert_dtypes(dtype_backend="pyarrow")
+            df = pd.read_sas(input_file, encoding=sas_encoding)
         elif in_fmt == "stata":
             df = pd.read_stata(input_file)
         elif in_fmt == "spss":
@@ -136,7 +192,7 @@ def convert_data(
                     f"[yellow]Warning: Could not parse rows '{rows}', ignoring row selection."
                 )
         # Convert dtypes to pyarrow if not already (skip if already done for SAS)
-        if in_fmt != "sas7bdat" and hasattr(df, "convert_dtypes"):
+        if hasattr(df, "convert_dtypes"):
             df = df.convert_dtypes(dtype_backend="pyarrow")
         # Write
         write_kwargs = {}
@@ -166,3 +222,70 @@ def convert_data(
         if "df" in locals():
             _show_preview(df, msg="Partial data preview (error context)")
         raise
+
+
+def infer_and_export_schema(
+    input_file: str,
+    input_format: Optional[str],
+    output_file: str,
+    nrows: int = 10000,
+    sheet_name: Optional[str] = None,
+    table_number: Optional[int] = None,
+    sas_keep_bytes: bool = False,
+):
+    """Infer schema from input file and export as JSON."""
+    import json
+
+    import pandas as pd
+    import pyarrow as pa
+
+    from .utils import infer_format
+
+    in_fmt = infer_format(input_file, input_format)
+    schema = None
+    sas_encoding = None if sas_keep_bytes else "utf-8"
+    if in_fmt in {"parquet", "feather"}:
+        table = (
+            pa.ipc.open_file(input_file)
+            if in_fmt == "feather"
+            else pa.parquet.read_table(input_file)
+        )
+        schema = table.schema
+    else:
+        read_kwargs = {}
+        if in_fmt == "csv":
+            read_kwargs["nrows"] = nrows
+        elif in_fmt == "excel" and sheet_name:
+            read_kwargs["sheet_name"] = sheet_name
+        elif in_fmt == "html" and table_number is not None:
+            read_kwargs["match"] = None
+            read_kwargs["flavor"] = "bs4"
+            read_kwargs["header"] = 0
+            read_kwargs["index_col"] = None
+        if in_fmt == "csv":
+            df = pd.read_csv(input_file, **read_kwargs)
+        elif in_fmt == "orc":
+            df = pd.read_orc(input_file)
+        elif in_fmt == "sas7bdat":
+            df = pd.read_sas(
+                input_file, chunksize=nrows, encoding=sas_encoding
+            ).__next__()
+        elif in_fmt == "stata":
+            df = pd.read_stata(input_file)
+        elif in_fmt == "spss":
+            df = pd.read_spss(input_file)
+        elif in_fmt == "excel":
+            df = pd.read_excel(input_file, **read_kwargs)
+        elif in_fmt == "html":
+            dfs = pd.read_html(input_file, **read_kwargs)
+            if table_number is not None and 0 <= table_number < len(dfs):
+                df = dfs[table_number]
+            else:
+                df = dfs[0]
+        else:
+            raise ValueError(f"Unsupported input format: {in_fmt}")
+        schema = pa.Schema.from_pandas(df)
+    # Export schema to JSON
+    schema_json = {"fields": [{"name": f.name, "type": str(f.type)} for f in schema]}
+    with open(output_file, "w") as f:
+        json.dump(schema_json, f, indent=2)

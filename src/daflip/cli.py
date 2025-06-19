@@ -4,11 +4,16 @@ CLI entrypoint for daflip.
 
 import typer
 
-from .controllers import main_controller
+from .controllers import convert, schema
+
+app = typer.Typer()
+
+app.command()(convert)
+app.command()(schema)
 
 
 def main():
-    typer.run(main_controller)
+    app()
 
 
 if __name__ == "__main__":
