@@ -1,0 +1,35 @@
+[project]
+name = "daflip"
+version = "0.1.0"
+description = "A CLI tool for converting data files between formats."
+authors = [{ name = "Vincent Grégoire", email = " vincent.gregoire@gmail.com" }]
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.12"
+dependencies = [
+    "pyarrow>=20.0.0",
+    "python-dotenv>=1.1.0",
+    "rich>=14.0.0",
+    "typer>=0.16.0",
+]
+
+
+[project.scripts]
+daflip = "daflip.cli:main"
+
+[tool.uv]
+# uv-specific options can be added here
+
+[tool.ruff]
+lint.select = ["E", "F", "W", "I"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+
+[build-system]
+requires = ["uv", "setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = ["pytest>=8.4.1", "ruff>=0.12.0"]
