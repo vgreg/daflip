@@ -25,10 +25,6 @@ daflip = "daflip.cli:main"
 # uv-specific options can be added here
 
 [tool.ruff]
-# Basic linting rules
-lint.select = ["E", "F", "W", "I"]
-lint.ignore = ["E501"]
-
 # Exclude common directories
 exclude = [
     ".git",
@@ -49,6 +45,11 @@ indent-width = 4
 
 # Assume Python 3.12
 target-version = "py312"
+
+[tool.ruff.lint]
+# Basic linting rules
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
