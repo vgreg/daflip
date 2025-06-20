@@ -146,10 +146,13 @@ jobs:
             --output docs/changelog.md
 
       - name: Commit version bump and changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add pyproject.toml src/daflip/__init__.py docs/changelog.md
           git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }} and update changelog [skip ci]"
           git tag v${{ steps.version.outputs.new_version }}
+          git push origin main
           git push origin v${{ steps.version.outputs.new_version }}
