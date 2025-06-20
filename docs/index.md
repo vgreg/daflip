@@ -26,6 +26,9 @@ daflip data.csv data.parquet --compression snappy
 
 # Convert large files with chunking
 daflip large.csv large.parquet --input-chunk-size 10000
+
+# Or use uvx for one-off conversions without installing
+uvx daflip data.csv data.parquet
 ```
 
 ## Supported Formats

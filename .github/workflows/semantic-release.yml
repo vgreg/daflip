@@ -135,6 +135,7 @@ jobs:
             - **Patch**: Bug fixes and other changes (default)
 
             *Changelog will be generated automatically and added to the documentation.*
+            *This release will be automatically published to PyPI.*
           draft: false
           prerelease: false
 

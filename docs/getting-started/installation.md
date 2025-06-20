@@ -21,7 +21,7 @@ uvx daflip --help
 pip install daflip
 ```
 
-## Install with uv
+## Install with uv (Recommended)
 
 ```bash
 uv add daflip
@@ -31,7 +31,7 @@ uv add daflip
 
 ```bash
 # Clone the repository
-git clone https://github.com/vgreg/daflip.git
+git clone https://github.com/vincentgregoire/daflip.git
 cd daflip
 
 # Install in development mode
@@ -50,6 +50,37 @@ daflip --help
 ```
 
 You should see the help output with available commands and options.
+
+## Using uvx (One-off Usage)
+
+For one-time conversions without installing:
+
+```bash
+# Convert a file without installing
+uvx daflip input.csv output.parquet
+
+# Show help
+uvx daflip --help
+```
+
+## Development Setup
+
+For contributing to Daflip:
+
+```bash
+# Clone and setup
+git clone https://github.com/vincentgregoire/daflip.git
+cd daflip
+
+# Install with development dependencies
+uv sync --dev
+
+# Run tests
+pytest
+
+# Run linting
+ruff check .
+```
 
 ## Next Steps
 
