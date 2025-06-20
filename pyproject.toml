@@ -21,10 +21,47 @@ daflip = "daflip.cli:main"
 # uv-specific options can be added here
 
 [tool.ruff]
+# Basic linting rules
 lint.select = ["E", "F", "W", "I"]
+lint.ignore = ["E501"]
+
+# Exclude common directories
+exclude = [
+    ".git",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+# Line length
+line-length = 88
+
+# Same as Black.
+indent-width = 4
+
+# Assume Python 3.12
+target-version = "py312"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "-v --tb=short"
 
 
 [build-system]
@@ -32,4 +69,4 @@ requires = ["uv", "setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [dependency-groups]
-dev = ["pytest>=8.4.1", "ruff>=0.12.0"]
+dev = ["pytest>=8.4.1", "pytest-cov>=4.1.0", "ruff>=0.12.0"]
