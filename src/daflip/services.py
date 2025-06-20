@@ -281,8 +281,10 @@ def _build_read_kwargs(
     if input_format == "fixed":
         raise NotImplementedError("Fixed-width file support is not yet implemented.")
 
-    if input_format == "excel" and sheet_name:
+    if input_format in ["excel", "xlsx", "xls"] and sheet_name:
         read_kwargs["sheet_name"] = sheet_name
+    if input_format == "xls":
+        read_kwargs["engine"] = "xlrd"
 
     if input_format == "html" and table_number is not None:
         read_kwargs["match"] = None
@@ -351,7 +353,11 @@ def _read_dataframe(
         return pd.read_stata(input_file)
     elif input_format == "spss":
         return pd.read_spss(input_file)
-    elif input_format == "excel":
+    elif input_format in ["excel", "xlsx"]:
+        return pd.read_excel(input_file, **read_kwargs)
+    elif input_format == "xls":
+        # Ensure engine is set to xlrd for .xls files
+        read_kwargs = {**read_kwargs, "engine": "xlrd"}
         return pd.read_excel(input_file, **read_kwargs)
     elif input_format == "html":
         dfs = pd.read_html(input_file, **read_kwargs)
@@ -404,6 +410,7 @@ def _build_write_kwargs(
     compression: Optional[str],
     compression_level: Optional[int],
     sheet_name: Optional[str],
+    output_format: str,
 ):
     """Build write kwargs for output.
 
@@ -411,6 +418,7 @@ def _build_write_kwargs(
         compression: Compression type (e.g., "gzip", "snappy")
         compression_level: Compression level (1-9 for gzip)
         sheet_name: Sheet name for Excel files
+        output_format: The output file format
 
     Returns:
         Dict: Dictionary of write parameters
@@ -421,8 +429,10 @@ def _build_write_kwargs(
         write_kwargs["compression"] = compression
     if compression_level is not None:
         write_kwargs["compression_level"] = compression_level
-    if sheet_name:
+    if sheet_name and output_format in ["excel", "xlsx", "xls"]:
         write_kwargs["sheet_name"] = sheet_name
+    if output_format == "xls":
+        write_kwargs["engine"] = "xlwt"
 
     return write_kwargs
 
@@ -450,7 +460,7 @@ def _write_dataframe(
         df.to_orc(output_file, index=False, **write_kwargs)
     elif output_format == "feather":
         df.to_feather(output_file, **write_kwargs)
-    elif output_format in ["excel", "xlsx"]:
+    elif output_format in ["excel", "xlsx", "xls"]:
         df.to_excel(output_file, index=False, **write_kwargs)
     elif output_format == "stata":
         # stata doesn't support index parameter
@@ -540,7 +550,9 @@ def convert_data(
         df = _convert_dtypes(df)
 
         # Write dataframe
-        write_kwargs = _build_write_kwargs(compression, compression_level, sheet_name)
+        write_kwargs = _build_write_kwargs(
+            compression, compression_level, sheet_name, out_fmt
+        )
         _write_dataframe(df, output_file, out_fmt, write_kwargs)
 
     except Exception as e:
@@ -657,7 +669,7 @@ def infer_and_export_schema(
         read_kwargs = {}
         if in_fmt == "csv":
             read_kwargs["nrows"] = nrows
-        elif in_fmt == "excel" and sheet_name:
+        elif in_fmt in ["excel", "xlsx"] and sheet_name:
             read_kwargs["sheet_name"] = sheet_name
         elif in_fmt == "html" and table_number is not None:
             read_kwargs["match"] = None

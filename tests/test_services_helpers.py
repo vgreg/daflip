@@ -310,17 +310,16 @@ def test_convert_dtypes():
 
 def test_build_write_kwargs():
     """Test building write kwargs."""
-    # Test with compression
-    kwargs = _build_write_kwargs("gzip", 6, None)
+    kwargs = _build_write_kwargs("gzip", 6, None, "csv")
     assert kwargs["compression"] == "gzip"
     assert kwargs["compression_level"] == 6
+    assert "sheet_name" not in kwargs
 
-    # Test with sheet name
-    kwargs = _build_write_kwargs(None, None, "Sheet1")
+    kwargs = _build_write_kwargs(None, None, "Sheet1", "excel")
     assert kwargs["sheet_name"] == "Sheet1"
+    assert "compression" not in kwargs
 
-    # Test with no options
-    kwargs = _build_write_kwargs(None, None, None)
+    kwargs = _build_write_kwargs(None, None, None, "csv")
     assert kwargs == {}
 
 

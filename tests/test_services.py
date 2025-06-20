@@ -354,9 +354,6 @@ def test_convert_excel_with_sheet_name(tmp_path):
     Args:
         tmp_path: Pytest fixture providing temporary directory
     """
-    # Skip this test due to openpyxl dependency issues in test environment
-    pytest.skip("Skipping Excel test due to dependency issues")
-
     # Create Excel file with multiple sheets
     df1 = pd.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
     df2 = pd.DataFrame({"c": [4, 5, 6], "d": ["a", "b", "c"]})
@@ -382,8 +379,6 @@ def test_convert_excel_invalid_sheet(tmp_path):
     Args:
         tmp_path: Pytest fixture providing temporary directory
     """
-    # Skip this test due to openpyxl dependency issues in test environment
-    pytest.skip("Skipping Excel test due to dependency issues")
 
     df = pd.DataFrame({"a": [1, 2, 3]})
     input_file = tmp_path / "input.xlsx"
@@ -561,3 +556,45 @@ def test_schema_export_format(tmp_path):
         assert "type" in field
         assert isinstance(field["name"], str)
         assert isinstance(field["type"], str)
+
+
+@pytest.mark.skipif(
+    not (
+        pytest.importorskip("xlrd", reason="xlrd required for .xls")
+        and pytest.importorskip("xlwt", reason="xlwt required for .xls")
+    ),
+    reason="xlrd and xlwt required for .xls support",
+)
+def test_convert_xls_roundtrip(tmp_path):
+    """Test roundtrip conversion for .xls format."""
+    df = pd.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
+    input_file = tmp_path / "input.xls"
+    output_file = tmp_path / "output.xls"
+    # Write input file
+    df.to_excel(input_file, index=False, engine="xlwt")
+    # Convert to .xls (should use xlrd/xlwt)
+    convert_data(str(input_file), str(output_file))
+    # Read output and compare
+    df2 = pd.read_excel(output_file, engine="xlrd")
+    pd.testing.assert_frame_equal(df, df2, check_dtype=False)
+
+
+@pytest.mark.skipif(
+    not (
+        pytest.importorskip("xlrd", reason="xlrd required for .xls")
+        and pytest.importorskip("xlwt", reason="xlwt required for .xls")
+    ),
+    reason="xlrd and xlwt required for .xls support",
+)
+def test_convert_xls_with_sheet_name(tmp_path):
+    """Test .xls conversion with a specific sheet name."""
+    df = pd.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
+    input_file = tmp_path / "input.xls"
+    output_file = tmp_path / "output.xls"
+    # Write input file with a custom sheet name
+    df.to_excel(input_file, index=False, sheet_name="MySheet", engine="xlwt")
+    # Convert, specifying the sheet name
+    convert_data(str(input_file), str(output_file), sheet_name="MySheet")
+    # Read output and compare
+    df2 = pd.read_excel(output_file, sheet_name="MySheet", engine="xlrd")
+    pd.testing.assert_frame_equal(df, df2, check_dtype=False)
