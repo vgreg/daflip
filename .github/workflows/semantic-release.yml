@@ -109,35 +109,29 @@ jobs:
           fi
 
       - name: Create Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ steps.version.outputs.new_version }}
-          release_name: Release v${{ steps.version.outputs.new_version }}
-          body: |
-            ## What's Changed
+        run: |
+          gh release create v${{ steps.version.outputs.new_version }} \
+            --title "Release v${{ steps.version.outputs.new_version }}" \
+            --notes "## What's Changed
 
-            This is an automated release with ${{ steps.version.outputs.bump_type }} version bump to ${{ steps.version.outputs.new_version }}.
+          This is an automated release with ${{ steps.version.outputs.bump_type }} version bump to ${{ steps.version.outputs.new_version }}.
 
-            ### Version Bump Type
-            - **${{ steps.version.outputs.bump_type }}** version increment
+          ### Version Bump Type
+          - **${{ steps.version.outputs.bump_type }}** version increment
 
-            ### Technical Details
-            - Version bumped from previous version
-            - All tests passing
-            - Code linting passed
+          ### Technical Details
+          - Version bumped from previous version
+          - All tests passing
+          - Code linting passed
 
-            ### Commit Analysis
-            The version bump was determined by analyzing commit messages since the last release.
-            - **Major**: Breaking changes (BREAKING CHANGE or !:)
-            - **Minor**: New features (feat:)
-            - **Patch**: Bug fixes and other changes (default)
+          ### Commit Analysis
+          The version bump was determined by analyzing commit messages since the last release.
+          - **Major**: Breaking changes (BREAKING CHANGE or !:)
+          - **Minor**: New features (feat:)
+          - **Patch**: Bug fixes and other changes (default)
 
-            *Changelog will be generated automatically and added to the documentation.*
-            *This release will be automatically published to PyPI.*
-          draft: false
-          prerelease: false
+          *Changelog will be generated automatically and added to the documentation.*
+          *This release will be automatically published to PyPI.*"
 
       - name: Generate Changelog
         run: |
