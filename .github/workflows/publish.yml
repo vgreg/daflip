@@ -37,7 +37,7 @@ jobs:
           uv run ruff check .
           uv run ruff format --check .
 
-      - name: Build package
+      - name: Build package with uv
         run: |
           uv build
 
