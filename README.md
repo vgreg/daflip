@@ -16,7 +16,7 @@ pip install daflip
 daflip convert input.csv output.parquet
 ```
 
-or 
+or
 
 ```sh
 uvx daflip convert input.csv output.parquet

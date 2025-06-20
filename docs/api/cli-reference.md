@@ -197,4 +197,4 @@ daflip data.sas7bdat data.csv
 
 ## Configuration Files
 
-Daflip currently doesn't support configuration files, but this feature is planned for future releases. 
+Daflip currently doesn't support configuration files, but this feature is planned for future releases.

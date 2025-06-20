@@ -90,7 +90,7 @@ convert_data("input.csv", "output.parquet")
 
 # With options
 convert_data(
-    "input.csv", 
+    "input.csv",
     "output.parquet",
     compression="snappy",
     input_chunk_size=10000
@@ -101,4 +101,4 @@ convert_data(
 
 - [Basic Usage](user-guide/basic-usage.md) - Detailed usage instructions
 - [Supported Formats](user-guide/supported-formats.md) - Complete format reference
-- [Advanced Features](user-guide/advanced-features.md) - Advanced usage patterns 
+- [Advanced Features](user-guide/advanced-features.md) - Advanced usage patterns

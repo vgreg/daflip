@@ -163,4 +163,4 @@ daflip problematic.csv output.parquet
 
 - [Supported Formats](supported-formats.md) - Complete format reference
 - [Advanced Features](advanced-features.md) - Advanced usage patterns
-- [CLI Reference](api/cli-reference.md) - Complete command reference 
+- [CLI Reference](api/cli-reference.md) - Complete command reference

@@ -53,4 +53,4 @@ uv run ruff check --fix .
 - Python 3.12+
 - uv package manager
 - pytest and pytest-cov for testing
-- ruff for linting and formatting 
+- ruff for linting and formatting

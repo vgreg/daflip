@@ -1,7 +1,7 @@
 site_name: Daflip
 site_description: A fast and flexible data format conversion tool
 site_author: Daflip Contributors
-site_url: https://vgreg.github.io/daflip/
+site_url: https://www.vincentgregoire.com/daflip/
 
 # Repository
 repo_name: vgreg/daflip
@@ -45,13 +45,6 @@ nav:
     - Supported Formats: user-guide/supported-formats.md
     - Advanced Features: user-guide/advanced-features.md
     - Configuration: user-guide/configuration.md
-  - API Reference:
-    - CLI Reference: api/cli-reference.md
-    - Python API: api/python-api.md
-  - Examples:
-    - Format Conversion: examples/format-conversion.md
-    - Data Processing: examples/data-processing.md
-    - Schema Management: examples/schema-management.md
   - Development:
     - Contributing: development/contributing.md
     - Testing: development/testing.md
@@ -114,4 +107,4 @@ extra:
       link: https://pypi.org/project/daflip/
 
 # Copyright
-copyright: Copyright &copy; 2024 Daflip Contributors 
+copyright: Copyright &copy; 2025 Vincent Grégoire and other contributors

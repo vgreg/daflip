@@ -8,7 +8,7 @@ Thank you for your interest in contributing to Daflip! This guide will help you 
 
 - Python 3.9 or higher
 - Git
-- uv (recommended) or pip
+- uv
 
 ### Getting Started
 
@@ -22,15 +22,21 @@ Thank you for your interest in contributing to Daflip! This guide will help you 
    ```bash
    # With uv (recommended)
    uv sync --dev
-   
+
    # With pip
    pip install -e ".[dev]"
    ```
 
-3. **Verify setup**
+3. **Install pre-commit hooks**
+   ```bash
+   pre-commit install
+   ```
+
+4. **Verify setup**
    ```bash
    pytest
    ruff check .
+   pre-commit run --all-files
    ```
 
 ## Development Workflow
@@ -98,15 +104,36 @@ ruff format .
 
 ### Pre-commit Hooks
 
-We recommend setting up pre-commit hooks:
+We use pre-commit hooks to ensure code quality and consistency. The hooks run automatically before each commit and include:
+
+- **Code formatting** with Ruff
+- **Linting** with Ruff
+- **Type checking** with MyPy
+- **Basic file checks** (trailing whitespace, YAML validation, etc.)
+
+### Setup
 
 ```bash
 # Install pre-commit
-pip install pre-commit
+uv add pre-commit
 
-# Install hooks
-pre-commit install
+# Install the git hooks
+uv run pre-commit install
 ```
+
+### Usage
+
+The hooks run automatically on commit, but you can also run them manually:
+
+```bash
+# Run all hooks on all files
+uv run pre-commit run --all-files
+
+# Run specific hook
+uv run pre-commit run ruff --all-files
+
+# Run hooks on staged files only
+pre-commit run
 
 ## Testing
 
@@ -114,16 +141,16 @@ pre-commit install
 
 ```bash
 # All tests
-pytest
+uv run pytest
 
 # With coverage
-pytest --cov=src/daflip --cov-report=html
+uv run pytest --cov=src/daflip --cov-report=html
 
 # Specific test
-pytest tests/test_services.py::test_convert_roundtrip
+uv run pytest tests/test_services.py::test_convert_roundtrip
 
 # Verbose output
-pytest -v
+uv run pytest -v
 ```
 
 ### Writing Tests
@@ -140,10 +167,10 @@ def test_feature_name():
     """Test description."""
     # Arrange
     input_data = "test"
-    
+
     # Act
     result = function_to_test(input_data)
-    
+
     # Assert
     assert result == expected_output
 ```
@@ -157,10 +184,10 @@ def test_feature_name():
 uv add mkdocs mkdocs-material
 
 # Build docs
-mkdocs build
+uv run mkdocs build
 
 # Serve docs locally
-mkdocs serve
+uv run mkdocs serve
 ```
 
 ### Documentation Guidelines
@@ -227,4 +254,4 @@ When creating a PR, include:
 3. Create release tag
 4. GitHub Actions will build and publish
 
-Thank you for contributing to Daflip! 🚀 
+Thank you for contributing to Daflip! 🚀

@@ -60,4 +60,4 @@ Choose your path:
 
 ## Contributing
 
-We welcome contributions! See our [Contributing Guide](development/contributing.md) for details. 
+We welcome contributions! See our [Contributing Guide](development/contributing.md) for details.
