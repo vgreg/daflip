@@ -1,0 +1,230 @@
+# Contributing to Daflip
+
+Thank you for your interest in contributing to Daflip! This guide will help you get started.
+
+## Development Setup
+
+### Prerequisites
+
+- Python 3.9 or higher
+- Git
+- uv (recommended) or pip
+
+### Getting Started
+
+1. **Fork and clone the repository**
+   ```bash
+   git clone https://github.com/your-username/daflip.git
+   cd daflip
+   ```
+
+2. **Install dependencies**
+   ```bash
+   # With uv (recommended)
+   uv sync --dev
+   
+   # With pip
+   pip install -e ".[dev]"
+   ```
+
+3. **Verify setup**
+   ```bash
+   pytest
+   ruff check .
+   ```
+
+## Development Workflow
+
+### 1. Create a Feature Branch
+
+```bash
+git checkout -b feature/your-feature-name
+```
+
+### 2. Make Your Changes
+
+- Write your code
+- Add tests for new functionality
+- Update documentation if needed
+
+### 3. Run Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=src/daflip
+
+# Run specific test file
+pytest tests/test_services.py
+
+# Run linting
+ruff check .
+ruff format .
+```
+
+### 4. Commit Your Changes
+
+```bash
+git add .
+git commit -m "feat: add new feature description"
+```
+
+### 5. Push and Create Pull Request
+
+```bash
+git push origin feature/your-feature-name
+```
+
+Then create a pull request on GitHub.
+
+## Code Style
+
+We use [Ruff](https://github.com/astral-sh/ruff) for linting and formatting.
+
+### Running Ruff
+
+```bash
+# Check for issues
+ruff check .
+
+# Fix auto-fixable issues
+ruff check . --fix
+
+# Format code
+ruff format .
+```
+
+### Pre-commit Hooks
+
+We recommend setting up pre-commit hooks:
+
+```bash
+# Install pre-commit
+pip install pre-commit
+
+# Install hooks
+pre-commit install
+```
+
+## Testing
+
+### Running Tests
+
+```bash
+# All tests
+pytest
+
+# With coverage
+pytest --cov=src/daflip --cov-report=html
+
+# Specific test
+pytest tests/test_services.py::test_convert_roundtrip
+
+# Verbose output
+pytest -v
+```
+
+### Writing Tests
+
+- Tests should be in the `tests/` directory
+- Use descriptive test names
+- Test both success and failure cases
+- Use pytest fixtures for common setup
+
+### Test Structure
+
+```python
+def test_feature_name():
+    """Test description."""
+    # Arrange
+    input_data = "test"
+    
+    # Act
+    result = function_to_test(input_data)
+    
+    # Assert
+    assert result == expected_output
+```
+
+## Documentation
+
+### Building Documentation
+
+```bash
+# Install docs dependencies
+uv add mkdocs mkdocs-material
+
+# Build docs
+mkdocs build
+
+# Serve docs locally
+mkdocs serve
+```
+
+### Documentation Guidelines
+
+- Write clear, concise documentation
+- Include examples for all features
+- Update API documentation when changing functions
+- Use proper markdown formatting
+
+## Pull Request Guidelines
+
+### Before Submitting
+
+1. **Tests pass**: All tests should pass
+2. **Linting passes**: No ruff errors
+3. **Documentation updated**: Update docs for new features
+4. **Commit messages**: Use conventional commit format
+
+### Commit Message Format
+
+```
+type(scope): description
+
+[optional body]
+
+[optional footer]
+```
+
+Types:
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes
+- `refactor`: Code refactoring
+- `test`: Test changes
+- `chore`: Build/tooling changes
+
+Examples:
+```
+feat(services): add support for new file format
+fix(cli): handle missing input file gracefully
+docs(api): update CLI reference with new options
+```
+
+### Pull Request Template
+
+When creating a PR, include:
+
+- Description of changes
+- Related issue (if any)
+- Testing performed
+- Breaking changes (if any)
+
+## Getting Help
+
+- **Issues**: Use GitHub issues for bugs and feature requests
+- **Discussions**: Use GitHub discussions for questions
+- **Code Review**: All PRs require review before merging
+
+## Release Process
+
+1. Update version in `pyproject.toml`
+2. Update changelog
+3. Create release tag
+4. GitHub Actions will build and publish
+
+Thank you for contributing to Daflip! 🚀 

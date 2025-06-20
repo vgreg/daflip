@@ -1,0 +1,117 @@
+site_name: Daflip
+site_description: A fast and flexible data format conversion tool
+site_author: Daflip Contributors
+site_url: https://vgreg.github.io/daflip/
+
+# Repository
+repo_name: vgreg/daflip
+repo_url: https://github.com/vgreg/daflip
+edit_uri: edit/main/docs/
+
+# Theme
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+# Navigation
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quick-start.md
+  - User Guide:
+    - Basic Usage: user-guide/basic-usage.md
+    - Supported Formats: user-guide/supported-formats.md
+    - Advanced Features: user-guide/advanced-features.md
+    - Configuration: user-guide/configuration.md
+  - API Reference:
+    - CLI Reference: api/cli-reference.md
+    - Python API: api/python-api.md
+  - Examples:
+    - Format Conversion: examples/format-conversion.md
+    - Data Processing: examples/data-processing.md
+    - Schema Management: examples/schema-management.md
+  - Development:
+    - Contributing: development/contributing.md
+    - Testing: development/testing.md
+
+# Plugins
+plugins:
+  - search
+
+# Markdown extensions
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - footnotes
+  - meta
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+  - toc:
+      anchorlink: true
+      permalink: true
+      title: On this page
+
+# Extra
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/vgreg/daflip
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/daflip/
+
+# Copyright
+copyright: Copyright &copy; 2024 Daflip Contributors 
