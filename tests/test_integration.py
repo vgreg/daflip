@@ -418,6 +418,6 @@ def test_full_workflow_csv_to_parquet_with_datetime_schema(tmp_path):
 
     # Check that date_col is actually a timestamp type
     date_field = schema.field("date_col")
-    assert str(date_field.type).startswith(
-        "timestamp"
-    ), f"Expected timestamp type, got {date_field.type}"
+    assert str(date_field.type).startswith("timestamp"), (
+        f"Expected timestamp type, got {date_field.type}"
+    )
