@@ -1,6 +1,6 @@
 [project]
 name = "daflip"
-version = "0.1.4"
+version = "0.1.6"
 description = "A modern Python CLI tool for converting data files between formats."
 authors = [{ name = "Vincent Grégoire", email = " vincent.gregoire@gmail.com" }]
 readme = "README.md"

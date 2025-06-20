@@ -17,5 +17,5 @@ Example usage:
     >>> convert_data("input.csv", "output.parquet", compression="snappy")
 """
 
-__version__ = "0.1.4"
+__version__ = "0.1.6"
 __author__ = "Daflip Team"
