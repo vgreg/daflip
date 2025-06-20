@@ -109,6 +109,8 @@ jobs:
           fi
 
       - name: Create Release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh release create v${{ steps.version.outputs.new_version }} \
             --title "Release v${{ steps.version.outputs.new_version }}" \
