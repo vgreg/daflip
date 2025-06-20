@@ -45,9 +45,17 @@ nav:
     - Supported Formats: user-guide/supported-formats.md
     - Advanced Features: user-guide/advanced-features.md
     - Configuration: user-guide/configuration.md
+  - API Reference:
+    - CLI Reference: api/cli-reference.md
+    - Python API: api/python-api.md
+  - Examples:
+    - Format Conversion: examples/format-conversion.md
+    - Data Processing: examples/data-processing.md
+    - Schema Management: examples/schema-management.md
   - Development:
     - Contributing: development/contributing.md
     - Testing: development/testing.md
+  - Changelog: changelog.md
 
 # Plugins
 plugins:

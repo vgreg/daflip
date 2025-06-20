@@ -1,0 +1,157 @@
+name: Semantic Release
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  semantic-release:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v2
+        with:
+          version: "latest"
+
+      - name: Install dependencies
+        run: |
+          uv sync --dev
+
+      - name: Run tests
+        run: |
+          uv run pytest
+
+      - name: Run linting
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Determine version bump
+        id: version
+        run: |
+          # Get current version
+          CURRENT_VERSION=$(uv run python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          echo "Current version: $CURRENT_VERSION"
+
+          # Parse version components
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+
+          # Get commit messages since last tag
+          COMMITS=$(git log --oneline --no-merges $(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD)
+
+          # Determine bump type based on commit messages
+          BUMP_TYPE="patch"  # default
+
+          if echo "$COMMITS" | grep -q "BREAKING CHANGE\|!:"; then
+            BUMP_TYPE="major"
+          elif echo "$COMMITS" | grep -q "^feat:"; then
+            BUMP_TYPE="minor"
+          fi
+
+          echo "Bump type: $BUMP_TYPE"
+
+          # Calculate new version
+          case $BUMP_TYPE in
+            "major")
+              NEW_MAJOR=$((major + 1))
+              NEW_VERSION="$NEW_MAJOR.0.0"
+              ;;
+            "minor")
+              NEW_MINOR=$((minor + 1))
+              NEW_VERSION="$major.$NEW_MINOR.0"
+              ;;
+            "patch")
+              NEW_PATCH=$((patch + 1))
+              NEW_VERSION="$major.$minor.$NEW_PATCH"
+              ;;
+          esac
+
+          echo "New version: $NEW_VERSION"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+
+      - name: Update version files
+        run: |
+          CURRENT_VERSION=$(uv run python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          NEW_VERSION="${{ steps.version.outputs.new_version }}"
+
+          # Update pyproject.toml
+          if [[ "$OSTYPE" == "darwin"* ]]; then
+            sed -i '' "s/version = \"$CURRENT_VERSION\"/version = \"$NEW_VERSION\"/" pyproject.toml
+          else
+            sed -i "s/version = \"$CURRENT_VERSION\"/version = \"$NEW_VERSION\"/" pyproject.toml
+          fi
+
+          # Update __init__.py if it exists
+          if [ -f "src/daflip/__init__.py" ]; then
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+              sed -i '' "s/__version__ = \"$CURRENT_VERSION\"/__version__ = \"$NEW_VERSION\"/" src/daflip/__init__.py
+            else
+              sed -i "s/__version__ = \"$CURRENT_VERSION\"/__version__ = \"$NEW_VERSION\"/" src/daflip/__init__.py
+            fi
+          fi
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.new_version }}
+          release_name: Release v${{ steps.version.outputs.new_version }}
+          body: |
+            ## What's Changed
+
+            This is an automated release with ${{ steps.version.outputs.bump_type }} version bump to ${{ steps.version.outputs.new_version }}.
+
+            ### Version Bump Type
+            - **${{ steps.version.outputs.bump_type }}** version increment
+
+            ### Technical Details
+            - Version bumped from previous version
+            - All tests passing
+            - Code linting passed
+
+            ### Commit Analysis
+            The version bump was determined by analyzing commit messages since the last release.
+            - **Major**: Breaking changes (BREAKING CHANGE or !:)
+            - **Minor**: New features (feat:)
+            - **Patch**: Bug fixes and other changes (default)
+
+            *Changelog will be generated automatically and added to the documentation.*
+          draft: false
+          prerelease: false
+
+      - name: Generate Changelog
+        run: |
+          python -m pip install PyGithub
+          python .github/scripts/generate_changelog.py \
+            --version ${{ steps.version.outputs.new_version }} \
+            --repo ${{ github.repository }} \
+            --output docs/changelog.md
+
+      - name: Commit version bump and changelog
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add pyproject.toml src/daflip/__init__.py docs/changelog.md
+          git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }} and update changelog [skip ci]"
+          git tag v${{ steps.version.outputs.new_version }}
+          git push origin main
+          git push origin v${{ steps.version.outputs.new_version }}
