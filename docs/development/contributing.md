@@ -79,7 +79,7 @@ git commit -m "feat: add new feature description"
 
 ### 5. Push and Create Pull Request
 
-```bash
+```bashq
 git push origin feature/your-feature-name
 ```
 
@@ -249,9 +249,37 @@ When creating a PR, include:
 
 ## Release Process
 
+The project uses automated semantic releases based on commit messages:
+
+### Automated Releases
+
+1. **Commit messages determine version bump**:
+   - `feat:` → minor version bump (0.1.0 → 0.2.0)
+   - `fix:` → patch version bump (0.1.0 → 0.1.1)
+   - `BREAKING CHANGE` or `!:` → major version bump (0.1.0 → 1.0.0)
+
+2. **GitHub Actions automatically**:
+   - Analyzes commit messages since last release
+   - Updates version in `pyproject.toml` and `src/daflip/__init__.py`
+   - Generates changelog
+   - Creates and pushes a git tag
+   - Creates a GitHub release
+   - Publishes to PyPI
+
+3. **Requirements for automated releases**:
+   - Repository admin or PAT token with admin privileges
+   - Branch protection rules configured to allow admin bypass
+   - Conventional commit messages
+
+### Manual Release (if needed)
+
+If automated releases fail:
+
 1. Update version in `pyproject.toml`
-2. Update changelog
-3. Create release tag
-4. GitHub Actions will build and publish
+2. Update version in `src/daflip/__init__.py`
+3. Update changelog
+4. Create release tag: `git tag v0.1.0`
+5. Push tag: `git push origin v0.1.0`
+6. GitHub Actions will build and publish
 
 Thank you for contributing to Daflip! 🚀
