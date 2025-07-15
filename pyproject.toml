@@ -1,20 +1,20 @@
 [project]
 name = "daflip"
-version = "0.1.8"
+version = "0.1.9"
 description = "A modern Python CLI tool for converting data files between formats."
 authors = [{ name = "Vincent Grégoire", email = " vincent.gregoire@gmail.com" }]
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
 dependencies = [
-    "openpyxl>=3.1.5",
-    "pandas>=2.3.0",
-    "pyarrow>=20.0.0",
-    "python-dotenv>=1.1.0",
-    "rich>=14.0.0",
-    "typer>=0.16.0",
-    "xlrd>=2.0.2",
-    "xlsxwriter>=3.2.5",
+  "openpyxl>=3.1.5",
+  "pandas>=2.3.0",
+  "pyarrow>=20.0.0",
+  "python-dotenv>=1.1.0",
+  "rich>=14.0.0",
+  "typer>=0.16.0",
+  "xlrd>=2.0.2",
+  "xlsxwriter>=3.2.5",
 ]
 
 
@@ -35,10 +35,10 @@ build-backend = "setuptools.build_meta"
 
 [dependency-groups]
 dev = [
-    "mkdocs>=1.6.1",
-    "mkdocs-material>=9.6.14",
-    "pre-commit>=4.2.0",
-    "pytest>=8.4.1",
-    "pytest-cov>=4.1.0",
-    "ruff>=0.12.0",
+  "mkdocs>=1.6.1",
+  "mkdocs-material>=9.6.14",
+  "pre-commit>=4.2.0",
+  "pytest>=8.4.1",
+  "pytest-cov>=4.1.0",
+  "ruff>=0.12.0",
 ]
